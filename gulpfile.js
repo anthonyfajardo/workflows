@@ -6,6 +6,7 @@ var gulp = require('gulp'),
 	connect = require('gulp-connect'),
 	gulpif = require('gulp-if'),
   minifyHTML = require('gulp-minify-html'),
+  jsonHTML = require('gulp-jsonminify'),
 	concat = require('gulp-concat');
 
 
@@ -61,7 +62,7 @@ gulp.task('compass', function(){
 	gulp.src(sassSources)
 		.pipe(compass({
 			sass: 'components/sass',
-			image: 'builds/development/' + 'images/',
+			image: 'builds/development' + 'images/',
 			style: sassStyle
 		}))
 		.on('error', gutil.log)
@@ -74,7 +75,7 @@ gulp.task('watch', function(){
 	gulp.watch(jsSources, ['js']);
 	gulp.watch('components/sass/*.scss', ['compass']);
 	gulp.watch('builds/development/*.html', ['html']);
-	gulp.watch(jsonSources, ['json'])
+	gulp.watch('builds/development/js/*.json', ['json'])
 });
 
 gulp.task('connect', function(){
@@ -93,7 +94,9 @@ gulp.task('html', function(){
 
 
 gulp.task('json', function(){
-	gulp.src(jsonSources)
+	gulp.src('builds/development/js/*.json')
+    .pipe(gulpif(env === 'production', jsonHTML()))
+    .pipe(gulpif(env === 'production', gulp.dest('builds/production/js')))
 		.pipe(connect.reload())
 });
 
